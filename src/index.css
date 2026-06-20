@@ -1,0 +1,105 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Essential variables */
+:root {
+    --scus-primary: #25eb2f;
+}
+
+/* Basic layout */
+html,
+body,
+#root {
+    height: 100%;
+}
+
+body {
+    @apply bg-gray-50 font-sans text-gray-800;
+    font-family: "Inter", ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+}
+
+/* Cards */
+.card {
+    @apply bg-white rounded-xl shadow-sm;
+    box-sizing: border-box;
+}
+
+.card-strong {
+    @apply bg-white rounded-xl shadow-md;
+    box-sizing: border-box;
+}
+
+/* Sidebar gradient */
+.sidebar-gradient {
+    background: linear-gradient(180deg, #04264a 0%, #0b3b72 100%);
+}
+
+/* Stat badge helpers */
+.stat-badge {
+    @apply w-12 h-12 rounded-lg flex items-center justify-center;
+}
+
+.stat-blue {
+    background: #EFF6FF;
+    color: #1E40AF;
+}
+
+.stat-green {
+    background: #ECFDF5;
+    color: #065F46;
+}
+
+.stat-indigo {
+    background: #EEF2FF;
+    color: #4F46E5;
+}
+
+.stat-orange {
+    background: #FFF7ED;
+    color: #B45309;
+}
+
+/* Timetable pill */
+.timetable-pill {
+    @apply rounded-2xl shadow-md px-4 py-3 text-center;
+    min-width: 110px;
+    box-sizing: border-box;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    margin: 6px 0;
+    /* small vertical spacing inside cell */
+}
+
+.text-xxs {
+    font-size: 11px;
+}
+
+/* Hide sidebar scrollbar while keeping scrollable */
+.sidebar-scroll {
+    overflow: auto;
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+    
+}
+
+.sidebar-scroll::-webkit-scrollbar {
+    display: none;
+    width: 0;
+    height: 0;
+}
+
+/* Small utilities */
+.gap-8px {
+    gap: 8px;
+}
+
+.p-8px {
+    padding: 8px;
+}
+
+.m-8px {
+    margin: 8px;
+}
+
