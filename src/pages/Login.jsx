@@ -28,8 +28,14 @@ export default function Login() {
         );
         if (match) {
             const token = btoa(`${match.email}:${Date.now()}`);
-            if (rememberMe) localStorage.setItem("scus_token", token);
-            else sessionStorage.setItem("scus_token", token);
+            localStorage.removeItem("scus_token");
+            localStorage.removeItem("scus_role");
+            sessionStorage.removeItem("scus_token");
+            sessionStorage.removeItem("scus_role");
+
+            const storage = rememberMe ? localStorage : sessionStorage;
+            storage.setItem("scus_token", token);
+            storage.setItem("scus_role", match.role);
             navigate("/dashboard");
         } else {
             setError("Invalid email or password.");

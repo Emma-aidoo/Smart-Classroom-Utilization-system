@@ -42,6 +42,14 @@ function RequireAuth({ children }) {
     return children;
 }
 
+function RequireRole({ allowedRoles, children }) {
+    const role = localStorage.getItem("scus_role") || sessionStorage.getItem("scus_role");
+    if (!allowedRoles.includes(role)) {
+        return <Navigate to="/dashboard" replace />;
+    }
+    return children;
+}
+
 export default function App() {
     console.log("App.jsx: rendering routes");
     return (
@@ -68,7 +76,14 @@ export default function App() {
                 <Route path="/reservations" element={<Reservations />} />
                 <Route path="/timetable" element={<Timetable />} />
                 <Route path="/analytics" element={<Analytics />} />
-                <Route path="/users" element={<Users />} />
+                <Route
+                    path="/users"
+                    element={
+                        <RequireRole allowedRoles={["Admin", "Lecturer"]}>
+                            <Users />
+                        </RequireRole>
+                    }
+                />
                 <Route path="/reports" element={<Reports />} />
                 <Route path="/settings" element={<Settings />} />
             </Route>

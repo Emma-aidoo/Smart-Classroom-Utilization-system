@@ -96,9 +96,13 @@ export default function Sidebar() {
     function handleLogout() {
         // clear mock auth tokens and navigate to login
         localStorage.removeItem("scus_token");
+        localStorage.removeItem("scus_role");
         sessionStorage.removeItem("scus_token");
+        sessionStorage.removeItem("scus_role");
         navigate("/login", { replace: true });
     }
+
+    const role = localStorage.getItem("scus_role") || sessionStorage.getItem("scus_role") || "";
 
     const items = [
         { to: "/dashboard", name: "Dashboard", icon: "dashboard" },
@@ -111,7 +115,7 @@ export default function Sidebar() {
         { to: "/reports", name: "Reports", icon: "reports" },
         { to: "/settings", name: "Settings", icon: "settings" },
         // logout will be rendered as an action (no real "to" route)
-    ];
+    ].filter((item) => !(role === "Student" && item.to === "/users"));
 
     return (
         <aside className="hidden lg:flex flex-col w-60 sidebar-gradient text-white h-screen p-4">
@@ -176,7 +180,7 @@ export default function Sidebar() {
                     <div className="w-10 h-10 rounded-full bg-white text-blue-700 flex items-center justify-center font-semibold">KE</div>
                     <div>
                         <div className="text-sm font-semibold">Khobina Emma</div>
-                        <div className="text-xs text-white/80">Admin</div>
+                        <div className="text-xs text-white/80">{role || "Admin"}</div>
                     </div>
                 </div>
             </div>
