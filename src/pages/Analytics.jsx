@@ -1,4 +1,11 @@
-import React from "react";
+import React, { useState } from "react";
+
+const classrooms = [
+    { name: "A101", utilization: 92, peakTime: "10AM - 12PM", lowTime: "03PM - 05PM" },
+    { name: "B204", utilization: 78, peakTime: "08AM - 10AM", lowTime: "03PM - 05PM" },
+    { name: "C312", utilization: 28, peakTime: "01PM - 03PM", lowTime: "03PM - 05PM" },
+    { name: "D410", utilization: 64, peakTime: "10AM - 12PM", lowTime: "03PM - 05PM" },
+];
 
 const metrics = [
     { label: "Average Utilization", value: "67%" },
@@ -36,6 +43,19 @@ function getHeatColor(v) {
 }
 
 export default function Analytics() {
+    const role = localStorage.getItem("scus_role") || sessionStorage.getItem("scus_role") || "Guest";
+    const [selectedRoom, setSelectedRoom] = useState(classrooms[0].name);
+
+    const mostUsed = classrooms.reduce((prev, curr) =>
+        curr.utilization > prev.utilization ? curr : prev,
+        classrooms[0]
+    );
+    const leastUsed = classrooms.reduce((prev, curr) =>
+        curr.utilization < prev.utilization ? curr : prev,
+        classrooms[0]
+    );
+    const selectedClass = classrooms.find((room) => room.name === selectedRoom) || classrooms[0];
+
     return (
         <div className="p-4 sm:p-6 w-full">
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
@@ -51,6 +71,33 @@ export default function Analytics() {
                         <option>Last Month</option>
                         <option>Custom</option>
                     </select>
+                </div>
+            </div>
+
+            <div className="grid grid-cols-1 lg:grid-cols-4 gap-4 mb-6">
+                <div className="card p-4 rounded-xl shadow-sm">
+                    <div className="text-sm text-gray-500">Most used classroom</div>
+                    <div className="text-2xl font-semibold text-gray-800 mt-3">
+                        {mostUsed.name} ({mostUsed.utilization}%)
+                    </div>
+                </div>
+                <div className="card p-4 rounded-xl shadow-sm">
+                    <div className="text-sm text-gray-500">Least used classroom</div>
+                    <div className="text-2xl font-semibold text-gray-800 mt-3">
+                        {leastUsed.name} ({leastUsed.utilization}%)
+                    </div>
+                </div>
+                <div className="card p-4 rounded-xl shadow-sm">
+                    <div className="text-sm text-gray-500">Peak usage window</div>
+                    <div className="text-2xl font-semibold text-gray-800 mt-3">
+                        {mostUsed.peakTime}
+                    </div>
+                </div>
+                <div className="card p-4 rounded-xl shadow-sm">
+                    <div className="text-sm text-gray-500">Least usage window</div>
+                    <div className="text-2xl font-semibold text-gray-800 mt-3">
+                        {leastUsed.lowTime}
+                    </div>
                 </div>
             </div>
 
@@ -151,6 +198,64 @@ export default function Analytics() {
                         <div className="text-right font-medium">42</div>
                     </div>
                 </div>
+            </div>
+
+            <div className="card p-6 rounded-xl mt-6">
+                <div className="flex items-center justify-between mb-4">
+                    <h2 className="text-lg font-semibold text-gray-800">
+                        Classroom analysis
+                    </h2>
+                    {role === "Admin" ? (
+                        <select
+                            value={selectedRoom}
+                            onChange={(e) => setSelectedRoom(e.target.value)}
+                            className="px-3 py-2 border border-gray-200 rounded-md text-sm bg-white"
+                        >
+                            {classrooms.map((room) => (
+                                <option key={room.name} value={room.name}>
+                                    {room.name}
+                                </option>
+                            ))}
+                        </select>
+                    ) : (
+                        <div className="text-xs text-gray-500">
+                            Admin privilege only: select a classroom for individual analysis.
+                        </div>
+                    )}
+                </div>
+
+                {role === "Admin" ? (
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm text-gray-600">
+                        <div className="p-4 rounded-2xl bg-gray-50">
+                            <div className="text-xs text-gray-500">Room</div>
+                            <div className="text-lg font-semibold text-gray-800 mt-2">
+                                {selectedClass.name}
+                            </div>
+                        </div>
+                        <div className="p-4 rounded-2xl bg-gray-50">
+                            <div className="text-xs text-gray-500">Utilization</div>
+                            <div className="text-lg font-semibold text-gray-800 mt-2">
+                                {selectedClass.utilization}%
+                            </div>
+                        </div>
+                        <div className="p-4 rounded-2xl bg-gray-50">
+                            <div className="text-xs text-gray-500">Peak usage</div>
+                            <div className="text-lg font-semibold text-gray-800 mt-2">
+                                {selectedClass.peakTime}
+                            </div>
+                        </div>
+                        <div className="p-4 rounded-2xl bg-gray-50">
+                            <div className="text-xs text-gray-500">Least usage</div>
+                            <div className="text-lg font-semibold text-gray-800 mt-2">
+                                {selectedClass.lowTime}
+                            </div>
+                        </div>
+                    </div>
+                ) : (
+                    <div className="text-sm text-gray-600 leading-relaxed">
+                        All users can review the most used and least used classrooms above, as well as overall peak and lowest usage windows. Individual classroom selection is limited to Admin only.
+                    </div>
+                )}
             </div>
 
             <div className="card p-6 rounded-xl mt-6">
