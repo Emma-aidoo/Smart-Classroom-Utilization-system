@@ -132,7 +132,7 @@ export default function Users() {
 
     return (
         <div className="p-4 sm:p-6">
-            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
+            <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between mb-6">
                 <div>
                     <h1 className="text-2xl font-bold text-gray-800">Users</h1>
                     <p className="text-sm text-gray-500 mt-1">
@@ -140,14 +140,14 @@ export default function Users() {
                     </p>
                 </div>
 
-                <div className="flex items-center gap-3">
-                    <div className="relative">
+                <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
+                    <div className="relative w-full sm:w-64">
                         <input
                             type="search"
                             value={q}
                             onChange={(e) => setQ(e.target.value)}
                             placeholder="Search user..."
-                            className="pl-10 pr-3 py-2 w-64 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
+                            className="pl-10 pr-3 py-2 w-full border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
                         />
                         <div className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">
                             <svg
@@ -176,7 +176,7 @@ export default function Users() {
                     <select
                         value={roleFilter}
                         onChange={(e) => setRoleFilter(e.target.value)}
-                        className="px-3 py-2 border border-gray-200 rounded-lg bg-white text-sm"
+                        className="w-full sm:w-auto px-3 py-2 border border-gray-200 rounded-lg bg-white text-sm"
                     >
                         {roles.map((r) => (
                             <option key={r} value={r}>
@@ -188,7 +188,7 @@ export default function Users() {
                     {isAdmin ? (
                         <button
                             onClick={openModal}
-                            className="inline-flex items-center gap-2 px-4 py-2 bg-primary text-white rounded-lg hover:bg-blue-700 transition"
+                            className="inline-flex items-center justify-center gap-2 px-4 py-2 bg-primary text-white rounded-lg hover:bg-blue-700 transition w-full sm:w-auto"
                         >
                             <svg
                                 className="w-4 h-4"
@@ -222,22 +222,22 @@ export default function Users() {
                 </div>
 
                 <div className="overflow-x-auto">
-                    <table className="w-full min-w-[720px]">
+                    <table className="w-full min-w-full table-auto">
                         <thead className="bg-white">
                             <tr>
-                                <th className="text-left px-4 py-3 text-sm font-medium text-gray-500">
+                                <th className="text-left px-4 py-3 text-sm font-medium text-gray-500 whitespace-nowrap">
                                     Name
                                 </th>
-                                <th className="text-left px-4 py-3 text-sm font-medium text-gray-500">
+                                <th className="text-left px-4 py-3 text-sm font-medium text-gray-500 whitespace-nowrap">
                                     Email
                                 </th>
-                                <th className="text-left px-4 py-3 text-sm font-medium text-gray-500">
+                                <th className="text-left px-4 py-3 text-sm font-medium text-gray-500 whitespace-nowrap">
                                     Role
                                 </th>
-                                <th className="text-left px-4 py-3 text-sm font-medium text-gray-500">
+                                <th className="text-left px-4 py-3 text-sm font-medium text-gray-500 whitespace-nowrap">
                                     Status
                                 </th>
-                                <th className="text-right px-4 py-3 text-sm font-medium text-gray-500">
+                                <th className="text-right px-4 py-3 text-sm font-medium text-gray-500 whitespace-nowrap">
                                     Action
                                 </th>
                             </tr>
@@ -263,17 +263,17 @@ export default function Users() {
                                         </div>
                                     </td>
 
-                                    <td className="px-4 py-4 text-sm text-gray-600">
+                                    <td className="px-4 py-4 text-sm text-gray-600 max-w-[180px] break-words">
                                         {u.email}
                                     </td>
-                                    <td className="px-4 py-4 text-sm text-gray-700">
+                                    <td className="px-4 py-4 text-sm text-gray-700 whitespace-nowrap">
                                         {u.role}
                                     </td>
                                     <td className="px-4 py-4 text-sm">
                                         {<StatusPill status={u.status} />}
                                     </td>
                                     <td className="px-4 py-4 text-sm text-right align-middle">
-                                        <div className="inline-flex items-center gap-2 justify-end h-full">
+                                        <div className="inline-flex flex-wrap items-center gap-2 justify-end h-full">
                                             {isAdmin ? (
                                                 <>
                                                     <button

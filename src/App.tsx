@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { Routes, Route, Navigate, Outlet } from "react-router-dom";
 import Sidebar from "./components/Sidebar";
 import Navbar from "./components/Navbar";
@@ -18,14 +18,14 @@ import Users from "./pages/Users";
 import Reports from "./pages/Reports";
 import Settings from "./pages/Settings";
 
-function ProtectedLayout() {
+function ProtectedLayout({ mobileOpen, onMobileMenuToggle, onMobileMenuClose }: { mobileOpen: boolean; onMobileMenuToggle: () => void; onMobileMenuClose: () => void; }) {
     // full viewport height/width layout: sidebar (lg) + main that fills remaining space
     return (
-        <div className="flex h-screen w-full bg-gray-50">
-            <Sidebar />
-            <div className="flex-1 flex flex-col min-h-0">
-                <Navbar />
-                <main className="flex-1 overflow-auto p-4 sm:p-6">
+        <div className="flex h-screen w-full max-w-full overflow-x-hidden bg-gray-50">
+            <Sidebar mobileOpen={mobileOpen} onClose={onMobileMenuClose} />
+            <div className="flex-1 flex flex-col min-h-0 min-w-0">
+                <Navbar onMobileMenuToggle={onMobileMenuToggle} />
+                <main className="flex-1 overflow-auto p-4 sm:p-6 min-w-0 max-w-full">
                     <Outlet />
                 </main>
             </div>
@@ -51,7 +51,11 @@ function RequireRole({ allowedRoles, children }: { allowedRoles: string[]; child
 }
 
 export default function App() {
-    console.log("App.jsx: rendering routes");
+    const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+    const toggleMobileMenu = () => setMobileMenuOpen((prev) => !prev);
+    const closeMobileMenu = () => setMobileMenuOpen(false);
+
+    console.log("App.tsx: rendering routes");
     return (
         <Routes>
             <Route path="/login" element={<Login />} />
@@ -64,7 +68,7 @@ export default function App() {
             <Route
                 element={
                     <RequireAuth>
-                        <ProtectedLayout />
+                        <ProtectedLayout mobileOpen={mobileMenuOpen} onMobileMenuToggle={toggleMobileMenu} onMobileMenuClose={closeMobileMenu} />
                     </RequireAuth>
                 }
             >

@@ -1,8 +1,8 @@
 import React, { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { FiMail, FiBell, FiLogOut, FiChevronDown } from "react-icons/fi";
+import { FiMail, FiBell, FiLogOut, FiChevronDown, FiMenu } from "react-icons/fi";
 
-export default function Navbar() {
+export default function Navbar({ onMobileMenuToggle }: { onMobileMenuToggle: () => void }) {
 	const navigate = useNavigate();
 
 	const handleLogout = () => {
@@ -62,8 +62,20 @@ export default function Navbar() {
 
 	return (
 		<header className="h-16 bg-white border-b border-gray-200 flex items-center justify-between px-4 lg:px-6">
-			<div>
-				<div className="text-lm text-gray-800">Welcome back, <span className="font-semibold text-gray-800">Khobina Emma!</span></div>
+			<div className="flex items-center gap-3 min-w-0">
+				<button
+					type="button"
+					onClick={onMobileMenuToggle}
+					className="inline-flex items-center justify-center p-2 rounded-md text-gray-600 hover:bg-gray-100 lg:hidden"
+					aria-label="Open mobile menu"
+				>
+					<FiMenu className="w-5 h-5" />
+				</button>
+				<div className="min-w-0">
+					<div className="truncate text-sm text-gray-800">
+						Welcome back, <span className="font-semibold">Khobina Emma!</span>
+					</div>
+				</div>
 			</div>
 
 			<div className="flex items-center gap-4">

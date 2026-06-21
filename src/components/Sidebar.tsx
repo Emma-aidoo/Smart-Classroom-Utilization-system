@@ -83,7 +83,7 @@ function Icon({ name }) {
     }
 }
 
-export default function Sidebar() {
+export default function Sidebar({ mobileOpen = false, onClose }: { mobileOpen?: boolean; onClose?: () => void }) {
     const navigate = useNavigate();
     const location = useLocation();
 
@@ -118,72 +118,144 @@ export default function Sidebar() {
     ].filter((item) => item.to !== "/users" || role === "Admin");
 
     return (
-        <aside className="hidden lg:flex flex-col w-60 sidebar-gradient text-white h-screen p-4">
-            <div className="mb-6">
-                <div className="flex items-center gap-3 px-2">
-                    <div className="w-10 h-10 rounded-lg bg-white/10 flex items-center justify-center">
-                        {/* mortarboard / graduation cap */}
-                        <svg className="w-6 h-6 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
-                            {/* cap (diamond) */}
-                            <path d="M12 2L1 7l11 5 11-5L12 2z" />
-                            {/* band under cap */}
-                            <path d="M2 8.5v3.5c0 .8 1.3 1.6 3 2.2 2 0.8 4.5 1.3 7 1.3s5-0.5 7-1.3c1.7-.6 3-1.4 3-2.2V8.5" />
-                            {/* tassel */}
-                            <path d="M12 7v7" />
-                            <path d="M12 14l3 1" />
-                        </svg>
-                    </div>
-                    <div>
-                        <div className="text-lg font-semibold">SCUS</div>
-                        <div className="text-xs text-white/80">Smart Classrooms</div>
+        <>
+            <aside className="hidden lg:flex flex-col w-60 sidebar-gradient text-white h-screen p-4">
+                <div className="mb-6">
+                    <div className="flex items-center gap-3 px-2">
+                        <div className="w-10 h-10 rounded-lg bg-white/10 flex items-center justify-center">
+                            {/* mortarboard / graduation cap */}
+                            <svg className="w-6 h-6 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+                                <path d="M12 2L1 7l11 5 11-5L12 2z" />
+                                <path d="M2 8.5v3.5c0 .8 1.3 1.6 3 2.2 2 0.8 4.5 1.3 7 1.3s5-0.5 7-1.3c1.7-.6 3-1.4 3-2.2V8.5" />
+                                <path d="M12 7v7" />
+                                <path d="M12 14l3 1" />
+                            </svg>
+                        </div>
+                        <div>
+                            <div className="text-lg font-semibold">SCUS</div>
+                            <div className="text-xs text-white/80">Smart Classrooms</div>
+                        </div>
                     </div>
                 </div>
-            </div>
 
-            <nav className="flex-1 sidebar-scroll">
-                <ul className="space-y-1">
-                    {items.map((it) => (
-                        <li key={it.to}>
-                            <NavLink
-                                to={it.to}
-                                className={({ isActive }) =>
-                                    `flex items-center gap-3 px-3 py-2 rounded-lg mx-1 transition-colors ${isActive ? "bg-white text-blue-700 font-semibold shadow-sm" : "text-white/90 hover:bg-white/10"
-                                    }`
-                                }
+                <nav className="flex-1 sidebar-scroll">
+                    <ul className="space-y-1">
+                        {items.map((it) => (
+                            <li key={it.to}>
+                                <NavLink
+                                    to={it.to}
+                                    className={({ isActive }) =>
+                                        `flex items-center gap-3 px-3 py-2 rounded-lg mx-1 transition-colors ${isActive ? "bg-white text-blue-700 font-semibold shadow-sm" : "text-white/90 hover:bg-white/10"}`
+                                    }
+                                >
+                                    <span className="flex-none" aria-hidden>
+                                        <Icon name={it.icon} />
+                                    </span>
+                                    <span className="text-sm">{it.name}</span>
+                                </NavLink>
+                            </li>
+                        ))}
+
+                        <li>
+                            <button
+                                onClick={handleLogout}
+                                className="w-full text-left flex items-center gap-3 px-3 py-2 rounded-lg mx-1 text-white/90 hover:bg-white/10"
                             >
                                 <span className="flex-none" aria-hidden>
-                                    <Icon name={it.icon} />
+                                    <Icon name="logout" />
                                 </span>
-                                <span className="text-sm">{it.name}</span>
-                            </NavLink>
+                                <span className="text-sm">Logout</span>
+                            </button>
                         </li>
-                    ))}
+                    </ul>
+                </nav>
 
-                    {/* Logout item below settings */}
-                    <li>
+                <div className="mt-6 pt-4 border-t border-white/10">
+                    <div className="flex items-center gap-3 px-2">
+                        <div className="w-10 h-10 rounded-full bg-white text-blue-700 flex items-center justify-center font-semibold">KE</div>
+                        <div>
+                            <div className="text-sm font-semibold">Khobina Emma</div>
+                            <div className="text-xs text-white/80">{role || "Admin"}</div>
+                        </div>
+                    </div>
+                </div>
+            </aside>
+
+            <div className={`fixed inset-0 z-40 lg:hidden transition-all duration-300 ${mobileOpen ? "pointer-events-auto" : "pointer-events-none"}`} aria-hidden={!mobileOpen}>
+                <div className={`absolute inset-0 bg-black/40 transition-opacity duration-300 ease-in-out ${mobileOpen ? "opacity-100" : "opacity-0"}`} onClick={onClose} />
+                <div className={`absolute left-0 top-0 bottom-0 flex w-72 flex-col bg-slate-900 p-4 shadow-xl transform transition-transform duration-300 ease-in-out ${mobileOpen ? "translate-x-0" : "-translate-x-full"}`}>
+                    <div className="flex items-center justify-between mb-6">
+                        <div className="flex items-center gap-3">
+                            <div className="w-10 h-10 rounded-lg bg-white/10 flex items-center justify-center">
+                                <svg className="w-6 h-6 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+                                    <path d="M12 2L1 7l11 5 11-5L12 2z" />
+                                    <path d="M2 8.5v3.5c0 .8 1.3 1.6 3 2.2 2 0.8 4.5 1.3 7 1.3s5-0.5 7-1.3c1.7-.6 3-1.4 3-2.2V8.5" />
+                                    <path d="M12 7v7" />
+                                    <path d="M12 14l3 1" />
+                                </svg>
+                            </div>
+                            <div>
+                                <div className="text-lg font-semibold text-white">SCUS</div>
+                                <div className="text-xs text-white/80">Smart Classrooms</div>
+                            </div>
+                        </div>
                         <button
-                            onClick={handleLogout}
-                            className="w-full text-left flex items-center gap-3 px-3 py-2 rounded-lg mx-1 text-white/90 hover:bg-white/10"
+                            type="button"
+                            onClick={onClose}
+                            className="rounded-md p-2 text-white hover:bg-white/10"
+                            aria-label="Close menu"
                         >
-                            <span className="flex-none" aria-hidden>
-                                <Icon name="logout" />
-                            </span>
-                            <span className="text-sm">Logout</span>
+                            ✕
                         </button>
-                    </li>
-                </ul>
-            </nav>
+                    </div>
 
-          
-            <div className="mt-6 pt-4 border-t border-white/10">
-                <div className="flex items-center gap-3 px-2">
-                    <div className="w-10 h-10 rounded-full bg-white text-blue-700 flex items-center justify-center font-semibold">KE</div>
-                    <div>
-                        <div className="text-sm font-semibold">Khobina Emma</div>
-                        <div className="text-xs text-white/80">{role || "Admin"}</div>
+                    <nav className="flex-1 overflow-y-auto">
+                        <ul className="space-y-1">
+                            {items.map((it) => (
+                                <li key={it.to}>
+                                    <NavLink
+                                        to={it.to}
+                                        onClick={onClose}
+                                        className={({ isActive }) =>
+                                            `flex items-center gap-3 px-3 py-3 rounded-lg transition-colors ${isActive ? "bg-white text-blue-700 font-semibold shadow-sm" : "text-white/90 hover:bg-white/10"}`
+                                        }
+                                    >
+                                        <span className="flex-none" aria-hidden>
+                                            <Icon name={it.icon} />
+                                        </span>
+                                        <span className="text-sm">{it.name}</span>
+                                    </NavLink>
+                                </li>
+                            ))}
+
+                            <li>
+                                <button
+                                    onClick={() => {
+                                        onClose?.();
+                                        handleLogout();
+                                    }}
+                                    className="w-full text-left flex items-center gap-3 px-3 py-3 rounded-lg text-white/90 hover:bg-white/10"
+                                >
+                                    <span className="flex-none" aria-hidden>
+                                        <Icon name="logout" />
+                                    </span>
+                                    <span className="text-sm">Logout</span>
+                                </button>
+                            </li>
+                        </ul>
+                    </nav>
+
+                    <div className="mt-6 pt-4 border-t border-white/10">
+                        <div className="flex items-center gap-3">
+                            <div className="w-10 h-10 rounded-full bg-white text-blue-700 flex items-center justify-center font-semibold">KE</div>
+                            <div>
+                                <div className="text-sm font-semibold text-white">Khobina Emma</div>
+                                <div className="text-xs text-white/80">{role || "Admin"}</div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
-        </aside>
+        </>
     );
 }
