@@ -45,6 +45,14 @@ const weeklyData = [
     { day: "Sun", util: 40 },
 ];
 
+const availableClassrooms = [
+    { Classroom: "Room 101", Capacity: 30, Floor: "1st", Status: "Available" },
+    { Classroom: "Room 201", Capacity: 40, Floor: "2nd", Status: "Available" },
+    { Classroom: "Lab A", Capacity: 24, Floor: "1st", Status: "Available" },
+    { Classroom: "Lecture Hall 3", Capacity: 80, Floor: "Ground", Status: "Available" },
+    { Classroom: "Room 305", Capacity: 28, Floor: "3rd", Status: "Available" },
+];
+
 function InlineLineChart({ data = [] }) {
     const w = 700;
     const h = 160;
@@ -131,14 +139,17 @@ export default function Dashboard() {
                 </div>
 
                 <div className="card p-6">
-                    <h3 className="text-lg font-semibold text-gray-800 mb-3">Recent Classrooms</h3>
+                    <div className="flex items-center justify-between mb-3">
+                        <div>
+                            <h3 className="text-lg font-semibold text-gray-800">Available Classrooms</h3>
+                            <p className="text-sm text-gray-500">All classrooms currently free for booking</p>
+                        </div>
+                        <div className="text-sm font-semibold text-green-700">{availableClassrooms.length} available</div>
+                    </div>
+
                     <Table
-                        columns={["Classroom", "Capacity", "Status"]}
-                        data={[
-                            { Classroom: "Room 101", Capacity: 30, Status: "Available" },
-                            { Classroom: "Room 102", Capacity: 25, Status: "In Use" },
-                            { Classroom: "Room 201", Capacity: 40, Status: "Available" },
-                        ]}
+                        columns={["Classroom", "Capacity", "Floor", "Status"]}
+                        data={availableClassrooms}
                     />
                 </div>
             </div>
