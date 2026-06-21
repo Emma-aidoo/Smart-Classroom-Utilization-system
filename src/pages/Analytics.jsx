@@ -236,15 +236,15 @@ export default function Analytics() {
                 </div>
             </div>
 
-            <div className="card p-6 rounded-xl mt-6">
-                <div className="mb-4">
-                    <h2 className="text-lg font-semibold text-gray-800">Analyze a classroom</h2>
-                    <p className="text-sm text-gray-500 mt-1">
-                        Search by classroom or floor and select a time range from 7AM to 9PM.
-                    </p>
-                </div>
+            {role === "Admin" && (
+                <div className="card p-6 rounded-xl mt-6">
+                    <div className="mb-4">
+                        <h2 className="text-lg font-semibold text-gray-800">Analyze a classroom</h2>
+                        <p className="text-sm text-gray-500 mt-1">
+                            Search by classroom or floor and select a time range from 7AM to 9PM.
+                        </p>
+                    </div>
 
-                {role === "Admin" ? (
                     <>
                         <div className="grid grid-cols-1 xl:grid-cols-4 gap-4 mb-6">
                             <div>
@@ -373,12 +373,8 @@ export default function Analytics() {
                             </div>
                         )}
                     </>
-                ) : (
-                    <div className="text-sm text-gray-600 leading-relaxed">
-                        All users can review the most used and least used classrooms above, as well as overall peak and lowest usage windows. Individual classroom selection is limited to Admin only.
-                    </div>
-                )}
-            </div>
+                </div>
+            )}
 
             <div className="card p-6 rounded-xl mt-6">
                 <div className="flex items-center justify-between mb-4">

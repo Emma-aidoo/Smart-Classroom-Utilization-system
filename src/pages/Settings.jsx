@@ -1,6 +1,9 @@
 import React, { useState, useEffect } from "react";
 
 export default function Settings() {
+    const role = localStorage.getItem("scus_role") || sessionStorage.getItem("scus_role") || "Guest";
+    const isAdmin = role === "Admin";
+
     const [org, setOrg] = useState({
         name: "Smart Classroom Utilization System",
         domain: "university.edu",
@@ -66,46 +69,10 @@ export default function Settings() {
             </div>
 
             <form onSubmit={handleSaveAll} className="space-y-6">
-                {/* Top row: Organization + Branding */}
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                    <section className="lg:col-span-2 card p-6">
-                        <h2 className="text-lg font-semibold text-gray-800 mb-4">Organization</h2>
+                    <section className={isAdmin ? "lg:col-span-2 card p-6" : "lg:col-span-3 card p-6"}>
+                        <h2 className="text-lg font-semibold text-gray-800 mb-4">Primary color</h2>
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                            <div>
-                                <label className="block text-sm text-gray-700">Organization name</label>
-                                <input
-                                    value={org.name}
-                                    onChange={(e) => setOrg((o) => ({ ...o, name: e.target.value }))}
-                                    className="mt-1 w-full px-3 py-2 border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
-                                    placeholder="Organization name"
-                                />
-                            </div>
-
-                            <div>
-                                <label className="block text-sm text-gray-700">Domain</label>
-                                <input
-                                    value={org.domain}
-                                    onChange={(e) => setOrg((o) => ({ ...o, domain: e.target.value }))}
-                                    className="mt-1 w-full px-3 py-2 border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
-                                    placeholder="university.edu"
-                                />
-                            </div>
-
-                            <div>
-                                <label className="block text-sm text-gray-700">Default timezone</label>
-                                <select
-                                    value={org.timezone}
-                                    onChange={(e) => setOrg((o) => ({ ...o, timezone: e.target.value }))}
-                                    className="mt-1 w-full px-3 py-2 border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
-                                >
-                                    <option>UTC-8</option>
-                                    <option>UTC-5</option>
-                                    <option>UTC+0</option>
-                                    <option>UTC+1</option>
-                                    <option>UTC+8</option>
-                                </select>
-                            </div>
-
                             <div>
                                 <label className="block text-sm text-gray-700">Primary color</label>
                                 <div className="mt-1 flex items-center gap-3">
@@ -141,85 +108,88 @@ export default function Settings() {
                         </div>
                     </section>
 
-                    <aside className="card p-6">
-                        <h3 className="text-lg font-semibold text-gray-800 mb-4">Branding</h3>
+                    {isAdmin && (
+                        <aside className="card p-6">
+                            <h3 className="text-lg font-semibold text-gray-800 mb-4">Branding</h3>
 
-                        <div className="flex flex-col items-center gap-3">
-                            <div className="w-28 h-28 rounded-xl bg-gray-50 border border-dashed border-gray-200 flex items-center justify-center overflow-hidden">
-                                {branding.logoPreview ? (
-                                    <img src={branding.logoPreview} alt="logo preview" className="object-contain w-full h-full" />
-                                ) : (
-                                    <div className="text-sm text-gray-400">{branding.logoName}</div>
-                                )}
+                            <div className="flex flex-col items-center gap-3">
+                                <div className="w-28 h-28 rounded-xl bg-gray-50 border border-dashed border-gray-200 flex items-center justify-center overflow-hidden">
+                                    {branding.logoPreview ? (
+                                        <img src={branding.logoPreview} alt="logo preview" className="object-contain w-full h-full" />
+                                    ) : (
+                                        <div className="text-sm text-gray-400">{branding.logoName}</div>
+                                    )}
+                                </div>
+
+                                <label className="inline-flex items-center gap-2 cursor-pointer">
+                                    <input type="file" accept="image/*" onChange={(e) => handleLogoChange(e.target.files?.[0])} className="hidden" />
+                                    <span className="px-3 py-2 bg-white border border-gray-200 rounded-md text-sm hover:bg-gray-50">Upload logo</span>
+                                </label>
+
+                                <p className="text-xs text-gray-500 text-center">Recommended: 256x256 PNG. Transparent background preferred.</p>
                             </div>
-
-                            <label className="inline-flex items-center gap-2 cursor-pointer">
-                                <input type="file" accept="image/*" onChange={(e) => handleLogoChange(e.target.files?.[0])} className="hidden" />
-                                <span className="px-3 py-2 bg-white border border-gray-200 rounded-md text-sm hover:bg-gray-50">Upload logo</span>
-                            </label>
-
-                            <p className="text-xs text-gray-500 text-center">Recommended: 256x256 PNG. Transparent background preferred.</p>
-                        </div>
-                    </aside>
+                        </aside>
+                    )}
                 </div>
 
-                {/* Booking & Security */}
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                    <section className="lg:col-span-2 card p-6">
-                        <h2 className="text-lg font-semibold text-gray-800 mb-4">Booking Settings</h2>
+                    {isAdmin && (
+                        <section className="lg:col-span-2 card p-6">
+                            <h2 className="text-lg font-semibold text-gray-800 mb-4">Booking Settings</h2>
 
-                        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                            <div>
-                                <label className="block text-sm text-gray-700">Default duration (mins)</label>
-                                <input
-                                    type="number"
-                                    value={booking.defaultDuration}
-                                    onChange={(e) => setBooking((b) => ({ ...b, defaultDuration: Number(e.target.value) }))}
-                                    className="mt-1 w-full px-3 py-2 border border-gray-200 rounded-md"
-                                />
-                            </div>
-
-                            <div>
-                                <label className="block text-sm text-gray-700">Minimum notice (mins)</label>
-                                <input
-                                    type="number"
-                                    value={booking.minNoticeMins}
-                                    onChange={(e) => setBooking((b) => ({ ...b, minNoticeMins: Number(e.target.value) }))}
-                                    className="mt-1 w-full px-3 py-2 border border-gray-200 rounded-md"
-                                />
-                            </div>
-                        </div>
-
-                        <div className="mt-6 border-t pt-6">
-                            <h3 className="text-md font-medium text-gray-800 mb-3">Security</h3>
-                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                                 <div>
-                                    <label className="flex items-center justify-between">
-                                        <span className="text-sm text-gray-700">Require strong passwords</span>
-                                        <input
-                                            type="checkbox"
-                                            checked={security.requireStrongPasswords}
-                                            onChange={(e) => setSecurity((s) => ({ ...s, requireStrongPasswords: e.target.checked }))}
-                                            className="w-5 h-5"
-                                        />
-                                    </label>
+                                    <label className="block text-sm text-gray-700">Default duration (mins)</label>
+                                    <input
+                                        type="number"
+                                        value={booking.defaultDuration}
+                                        onChange={(e) => setBooking((b) => ({ ...b, defaultDuration: Number(e.target.value) }))}
+                                        className="mt-1 w-full px-3 py-2 border border-gray-200 rounded-md"
+                                    />
                                 </div>
 
                                 <div>
-                                    <label className="flex items-center justify-between">
-                                        <span className="text-sm text-gray-700">Two-factor authentication</span>
-                                        <input
-                                            checked={security.twoFactor}
-                                            onChange={(e) => setSecurity((s) => ({ ...s, twoFactor: e.target.checked }))}
-                                            className="w-5 h-5"
-                                        />
-                                    </label>
+                                    <label className="block text-sm text-gray-700">Minimum notice (mins)</label>
+                                    <input
+                                        type="number"
+                                        value={booking.minNoticeMins}
+                                        onChange={(e) => setBooking((b) => ({ ...b, minNoticeMins: Number(e.target.value) }))}
+                                        className="mt-1 w-full px-3 py-2 border border-gray-200 rounded-md"
+                                    />
                                 </div>
                             </div>
-                        </div>
-                    </section>
 
-                    <aside className="card p-6">
+                            <div className="mt-6 border-t pt-6">
+                                <h3 className="text-md font-medium text-gray-800 mb-3">Security</h3>
+                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                    <div>
+                                        <label className="flex items-center justify-between">
+                                            <span className="text-sm text-gray-700">Require strong passwords</span>
+                                            <input
+                                                type="checkbox"
+                                                checked={security.requireStrongPasswords}
+                                                onChange={(e) => setSecurity((s) => ({ ...s, requireStrongPasswords: e.target.checked }))}
+                                                className="w-5 h-5"
+                                            />
+                                        </label>
+                                    </div>
+
+                                    <div>
+                                        <label className="flex items-center justify-between">
+                                            <span className="text-sm text-gray-700">Two-factor authentication</span>
+                                            <input
+                                                checked={security.twoFactor}
+                                                onChange={(e) => setSecurity((s) => ({ ...s, twoFactor: e.target.checked }))}
+                                                className="w-5 h-5"
+                                            />
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                        </section>
+                    )}
+
+                    <aside className={isAdmin ? "card p-6" : "lg:col-span-3 card p-6"}>
                         <h3 className="text-lg font-semibold text-gray-800 mb-4">Notifications</h3>
                         <div className="space-y-3">
                             <label className="flex items-center justify-between">
