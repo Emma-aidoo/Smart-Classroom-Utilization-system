@@ -34,20 +34,20 @@ function ProtectedLayout() {
 }
 
 // Simple auth guard: checks localStorage or sessionStorage for token
-function RequireAuth({ children }) {
-    const token = localStorage.getItem("scus_token") || sessionStorage.getItem("scus_token");
+function RequireAuth({ children }: { children: React.ReactNode }) {
+    const token = localStorage.getItem("scus_token") || sessionStorage.getItem("scus_token") || "";
     if (!token) {
         return <Navigate to="/login" replace />;
     }
-    return children;
+    return <>{children}</>;
 }
 
-function RequireRole({ allowedRoles, children }) {
-    const role = localStorage.getItem("scus_role") || sessionStorage.getItem("scus_role");
+function RequireRole({ allowedRoles, children }: { allowedRoles: string[]; children: React.ReactNode }) {
+    const role = localStorage.getItem("scus_role") || sessionStorage.getItem("scus_role") || "";
     if (!allowedRoles.includes(role)) {
         return <Navigate to="/dashboard" replace />;
     }
-    return children;
+    return <>{children}</>;
 }
 
 export default function App() {

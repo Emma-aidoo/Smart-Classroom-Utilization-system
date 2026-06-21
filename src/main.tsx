@@ -37,13 +37,13 @@ if (!container) {
     }
 
     // global runtime handlers to display errors instead of a white screen
-    window.addEventListener("error", (e) => {
-        const msg = e?.error ? e.error.stack || e.error.message : e.message || String(e);
+    window.addEventListener("error", (e: ErrorEvent) => {
+        const msg = e.error ? e.error.stack || e.error.message : e.message || String(e);
         showFatal(msg);
     });
 
-    window.addEventListener("unhandledrejection", (ev) => {
-        const reason = ev?.reason ? (ev.reason.stack || ev.reason.message || JSON.stringify(ev.reason)) : "Unhandled rejection";
+    window.addEventListener("unhandledrejection", (ev: PromiseRejectionEvent) => {
+        const reason = ev.reason ? (ev.reason && typeof ev.reason === "object" ? (ev.reason as any).stack || (ev.reason as any).message || JSON.stringify(ev.reason) : String(ev.reason)) : "Unhandled rejection";
         showFatal(reason);
     });
 }
