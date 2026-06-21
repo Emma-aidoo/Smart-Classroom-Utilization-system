@@ -115,7 +115,7 @@ export default function Sidebar() {
         { to: "/reports", name: "Reports", icon: "reports" },
         { to: "/settings", name: "Settings", icon: "settings" },
         // logout will be rendered as an action (no real "to" route)
-    ].filter((item) => !(role === "Student" && item.to === "/users"));
+    ].filter((item) => item.to !== "/users" || role === "Admin");
 
     return (
         <aside className="hidden lg:flex flex-col w-60 sidebar-gradient text-white h-screen p-4">

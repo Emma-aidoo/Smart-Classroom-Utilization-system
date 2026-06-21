@@ -43,6 +43,10 @@ const EVENTS = (() => {
 
 export default function Timetable() {
     const [weekOffset, setWeekOffset] = useState(0);
+    const [uploadedFileName, setUploadedFileName] = useState("");
+    const [analysisReady, setAnalysisReady] = useState(false);
+    const [analysisStatus, setAnalysisStatus] = useState("");
+    const role = localStorage.getItem("scus_role") || sessionStorage.getItem("scus_role") || "Guest";
 
     const weekLabel = useMemo(() => {
         const now = new Date();
@@ -53,6 +57,24 @@ export default function Timetable() {
         const opts = { month: "short", day: "numeric" };
         return `${start.toLocaleDateString(undefined, opts)} — ${end.toLocaleDateString(undefined, opts)}`;
     }, [weekOffset]);
+
+    const handleFileChange = (event) => {
+        const file = event.target.files?.[0];
+        if (file) {
+            setUploadedFileName(file.name);
+            setAnalysisReady(false);
+            setAnalysisStatus("Custom timetable loaded. Click analyze to compare it against existing classrooms.");
+        }
+    };
+
+    const analyzeTimetable = () => {
+        if (!uploadedFileName) return;
+        setAnalysisReady(true);
+        setAnalysisStatus(`Analyzing ${uploadedFileName} against current classroom availability...`);
+        setTimeout(() => {
+            setAnalysisStatus(`Analysis complete for ${uploadedFileName}: best fit found for available rooms.`);
+        }, 900);
+    };
 
     // layout constants
     const timeCol = 120; // px
@@ -65,20 +87,43 @@ export default function Timetable() {
 
     return (
         <div className="w-full h-full min-h-screen p-4 sm:p-6">
-            <div className="flex items-center justify-between mb-4">
+            <div className="flex flex-col gap-4 mb-4 sm:flex-row sm:items-center sm:justify-between">
                 <div>
                     <h2 className="text-lg font-semibold text-gray-800">Timetable</h2>
                     <p className="text-sm text-gray-500 mt-1">Weekly classroom schedule</p>
                 </div>
 
-                <div className="flex items-center gap-2">
-                    <button onClick={() => setWeekOffset((s) => s - 1)} className="p-2 rounded-md border border-gray-200 bg-white hover:bg-gray-50">
-                        ‹
-                    </button>
-                    <div className="px-3 py-2 bg-white border border-gray-200 rounded-md text-sm">{weekLabel}</div>
-                    <button onClick={() => setWeekOffset((s) => s + 1)} className="p-2 rounded-md border border-gray-200 bg-white hover:bg-gray-50">
-                        ›
-                    </button>
+                <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
+                    {role === "Admin" && (
+                        <div className="flex items-center gap-2">
+                            <label className="inline-flex items-center gap-2 px-4 py-2 border border-blue-600 text-blue-600 rounded-md cursor-pointer bg-white hover:bg-blue-50">
+                                <input
+                                    type="file"
+                                    accept=".csv, .xlsx, .json"
+                                    className="hidden"
+                                    onChange={handleFileChange}
+                                />
+                                Upload timetable
+                            </label>
+                            <button
+                                type="button"
+                                onClick={analyzeTimetable}
+                                disabled={!uploadedFileName}
+                                className={`px-4 py-2 rounded-md text-sm font-medium ${uploadedFileName ? "bg-blue-600 text-white hover:bg-blue-700" : "bg-gray-200 text-gray-500 cursor-not-allowed"}`}
+                            >
+                                Analyze
+                            </button>
+                        </div>
+                    )}
+                    <div className="flex items-center gap-2">
+                        <button onClick={() => setWeekOffset((s) => s - 1)} className="p-2 rounded-md border border-gray-200 bg-white hover:bg-gray-50">
+                            ‹
+                        </button>
+                        <div className="px-3 py-2 bg-white border border-gray-200 rounded-md text-sm">{weekLabel}</div>
+                        <button onClick={() => setWeekOffset((s) => s + 1)} className="p-2 rounded-md border border-gray-200 bg-white hover:bg-gray-50">
+                            ›
+                        </button>
+                    </div>
                 </div>
             </div>
 
@@ -210,7 +255,19 @@ export default function Timetable() {
                 </div>
             </div>
 
-            {/* <div className="mt-3 text-sm text-gray-500">Tip: scroll horizontally on small screens to view all days.</div> */}
+            {role === "Admin" && (
+                <div className="mt-4 rounded-xl border border-blue-100 bg-blue-50 p-4 text-sm text-blue-800">
+                    <div className="font-medium">Custom timetable upload</div>
+                    <div className="mt-2">
+                        {analysisStatus || "Upload a custom timetable file to compare it with existing classroom availability."}
+                    </div>
+                    {analysisReady && (
+                        <div className="mt-2 text-blue-700">
+                            Analysis ready: the custom timetable has been compared against available classrooms.
+                        </div>
+                    )}
+                </div>
+            )}
         </div>
     );
 }

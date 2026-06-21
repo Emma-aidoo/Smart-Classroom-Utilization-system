@@ -67,6 +67,8 @@ function StatusPill({ status }) {
 }
 
 export default function Users() {
+    const role = localStorage.getItem("scus_role") || sessionStorage.getItem("scus_role") || "Guest";
+    const isAdmin = role === "Admin";
     const [users, setUsers] = useState(INITIAL_USERS);
     const [q, setQ] = useState("");
     const [roleFilter, setRoleFilter] = useState("All");
@@ -183,25 +185,31 @@ export default function Users() {
                         ))}
                     </select>
 
-                    <button
-                        onClick={openModal}
-                        className="inline-flex items-center gap-2 px-4 py-2 bg-primary text-white rounded-lg hover:bg-blue-700 transition"
-                    >
-                        <svg
-                            className="w-4 h-4"
-                            viewBox="0 0 24 24"
-                            fill="none"
-                            stroke="currentColor"
-                            strokeWidth="1.5"
+                    {isAdmin ? (
+                        <button
+                            onClick={openModal}
+                            className="inline-flex items-center gap-2 px-4 py-2 bg-primary text-white rounded-lg hover:bg-blue-700 transition"
                         >
-                            <path
-                                d="M12 5v14M5 12h14"
-                                strokeLinecap="round"
-                                strokeLinejoin="round"
-                            />
-                        </svg>
-                        Add User
-                    </button>
+                            <svg
+                                className="w-4 h-4"
+                                viewBox="0 0 24 24"
+                                fill="none"
+                                stroke="currentColor"
+                                strokeWidth="1.5"
+                            >
+                                <path
+                                    d="M12 5v14M5 12h14"
+                                    strokeLinecap="round"
+                                    strokeLinejoin="round"
+                                />
+                            </svg>
+                            Add User
+                        </button>
+                    ) : (
+                        <div className="px-4 py-2 rounded-lg border border-gray-200 text-sm text-gray-600 bg-gray-50">
+                            Only admin can add or remove users.
+                        </div>
+                    )}
                 </div>
             </div>
 
@@ -266,14 +274,26 @@ export default function Users() {
                                     </td>
                                     <td className="px-4 py-4 text-sm text-right align-middle">
                                         <div className="inline-flex items-center gap-2 justify-end h-full">
-                                            <button
-                                                onClick={() => toggleStatus(u.id)}
-                                                className="px-3 py-1 text-sm rounded-md border border-gray-200 hover:bg-gray-50"
-                                            >
-                                                {u.status === "Active"
-                                                    ? "Disable"
-                                                    : "Activate"}
-                                            </button>
+                                            {isAdmin ? (
+                                                <>
+                                                    <button
+                                                        onClick={() => toggleStatus(u.id)}
+                                                        className="px-3 py-1 text-sm rounded-md border border-gray-200 hover:bg-gray-50"
+                                                    >
+                                                        {u.status === "Active"
+                                                            ? "Disable"
+                                                            : "Activate"}
+                                                    </button>
+                                                    <button
+                                                        onClick={() => setUsers((prev) => prev.filter((item) => item.id !== u.id))}
+                                                        className="px-3 py-1 text-sm rounded-md border border-red-200 text-red-700 hover:bg-red-50"
+                                                    >
+                                                        Remove
+                                                    </button>
+                                                </>
+                                            ) : (
+                                                <span className="text-gray-500">No actions available</span>
+                                            )}
                                         </div>
                                     </td>
                                 </tr>

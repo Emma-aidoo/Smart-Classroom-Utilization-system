@@ -77,6 +77,7 @@ function IconDots() {
 }
 
 export default function Reservations() {
+    const role = localStorage.getItem("scus_role") || sessionStorage.getItem("scus_role") || "Guest";
     const [tab, setTab] = useState("upcoming");
     const [data, setData] = useState(DUMMY);
 
@@ -118,6 +119,10 @@ export default function Reservations() {
         setData((d) => [newRes, ...d]);
         setModalOpen(false);
         setTab("upcoming");
+    };
+
+    const handleUpdateStatus = (id, status) => {
+        setData((prev) => prev.map((item) => (item.id === id ? { ...item, status } : item)));
     };
 
     const tabs = [
@@ -220,9 +225,35 @@ export default function Reservations() {
 
                                     <div className="flex-shrink-0 flex flex-col items-end gap-2">
                                         <StatusPill status={r.status} />
-                                        <button className="p-1 rounded-md hover:bg-gray-100">
-                                            <IconDots />
-                                        </button>
+                                        {role === "Admin" && r.status === "Pending" && (
+                                            <div className="flex gap-2">
+                                                <button
+                                                    onClick={() => handleUpdateStatus(r.id, "Confirmed")}
+                                                    className="px-3 py-1 rounded-md bg-emerald-600 text-white text-xs hover:bg-emerald-700"
+                                                >
+                                                    Accept
+                                                </button>
+                                                <button
+                                                    onClick={() => handleUpdateStatus(r.id, "Cancelled")}
+                                                    className="px-3 py-1 rounded-md bg-red-600 text-white text-xs hover:bg-red-700"
+                                                >
+                                                    Revoke
+                                                </button>
+                                            </div>
+                                        )}
+                                        {role === "Admin" && r.status === "Confirmed" && (
+                                            <button
+                                                onClick={() => handleUpdateStatus(r.id, "Cancelled")}
+                                                className="px-3 py-1 rounded-md bg-red-600 text-white text-xs hover:bg-red-700"
+                                            >
+                                                Revoke
+                                            </button>
+                                        )}
+                                        {role !== "Admin" && (
+                                            <button className="p-1 rounded-md hover:bg-gray-100">
+                                                <IconDots />
+                                            </button>
+                                        )}
                                     </div>
                                 </div>
                             </div>

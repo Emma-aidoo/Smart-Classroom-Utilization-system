@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 
 const classrooms = [
     { name: "A101", utilization: 92, peakTime: "10AM - 12PM", lowTime: "03PM - 05PM" },
@@ -25,6 +25,12 @@ const byDay = [
 
 const days = ["Mon", "Tue", "Wed", "Thu", "Fri"];
 const times = ["08AM - 10AM", "10AM - 12PM", "01PM - 03PM", "03PM - 05PM"];
+const floorOptions = ["All", "A", "B", "C", "D"];
+const timeOptions = Array.from({ length: 15 }, (_, index) => {
+    const hour = 7 + index;
+    const label = hour > 12 ? `${hour - 12}PM` : `${hour}AM`;
+    return `${hour.toString().padStart(2, "0")}:00`;
+});
 
 // dummy heatmap values 4x5
 const heatmap = [
@@ -42,9 +48,39 @@ function getHeatColor(v) {
     return `hsl(${hue} 90% ${light}%)`;
 }
 
+function formatTime(value) {
+    const hour = Number(value.split(":")[0]);
+    if (hour === 0) return "12AM";
+    if (hour < 12) return `${hour}AM`;
+    if (hour === 12) return "12PM";
+    return `${hour - 12}PM`;
+}
+
 export default function Analytics() {
     const role = localStorage.getItem("scus_role") || sessionStorage.getItem("scus_role") || "Guest";
+    const [searchTerm, setSearchTerm] = useState("");
+    const [selectedFloor, setSelectedFloor] = useState("All");
+    const [startTime, setStartTime] = useState("07:00");
+    const [endTime, setEndTime] = useState("21:00");
     const [selectedRoom, setSelectedRoom] = useState(classrooms[0].name);
+
+    const filteredRooms = classrooms.filter((room) => {
+        const query = searchTerm.trim().toLowerCase();
+        const matchesSearch =
+            !query ||
+            room.name.toLowerCase().includes(query) ||
+            room.name[0].toLowerCase() === query ||
+            query === `floor ${room.name[0].toLowerCase()}`;
+        const matchesFloor =
+            selectedFloor === "All" || room.name.startsWith(selectedFloor);
+        return matchesSearch && matchesFloor;
+    });
+
+    useEffect(() => {
+        if (!filteredRooms.some((room) => room.name === selectedRoom) && filteredRooms.length > 0) {
+            setSelectedRoom(filteredRooms[0].name);
+        }
+    }, [filteredRooms, selectedRoom]);
 
     const mostUsed = classrooms.reduce((prev, curr) =>
         curr.utilization > prev.utilization ? curr : prev,
@@ -201,56 +237,142 @@ export default function Analytics() {
             </div>
 
             <div className="card p-6 rounded-xl mt-6">
-                <div className="flex items-center justify-between mb-4">
-                    <h2 className="text-lg font-semibold text-gray-800">
-                        Classroom analysis
-                    </h2>
-                    {role === "Admin" ? (
-                        <select
-                            value={selectedRoom}
-                            onChange={(e) => setSelectedRoom(e.target.value)}
-                            className="px-3 py-2 border border-gray-200 rounded-md text-sm bg-white"
-                        >
-                            {classrooms.map((room) => (
-                                <option key={room.name} value={room.name}>
-                                    {room.name}
-                                </option>
-                            ))}
-                        </select>
-                    ) : (
-                        <div className="text-xs text-gray-500">
-                            Admin privilege only: select a classroom for individual analysis.
-                        </div>
-                    )}
+                <div className="mb-4">
+                    <h2 className="text-lg font-semibold text-gray-800">Analyze a classroom</h2>
+                    <p className="text-sm text-gray-500 mt-1">
+                        Search by classroom or floor and select a time range from 7AM to 9PM.
+                    </p>
                 </div>
 
                 {role === "Admin" ? (
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm text-gray-600">
-                        <div className="p-4 rounded-2xl bg-gray-50">
-                            <div className="text-xs text-gray-500">Room</div>
-                            <div className="text-lg font-semibold text-gray-800 mt-2">
-                                {selectedClass.name}
+                    <>
+                        <div className="grid grid-cols-1 xl:grid-cols-4 gap-4 mb-6">
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700 mb-2">
+                                    Search classroom or floor
+                                </label>
+                                <input
+                                    type="text"
+                                    value={searchTerm}
+                                    onChange={(e) => setSearchTerm(e.target.value)}
+                                    placeholder="e.g. A101 or floor B"
+                                    className="w-full px-3 py-2 border border-gray-200 rounded-md text-sm bg-white"
+                                />
+                            </div>
+
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700 mb-2">
+                                    Classroom
+                                </label>
+                                <select
+                                    value={selectedRoom}
+                                    onChange={(e) => setSelectedRoom(e.target.value)}
+                                    className="w-full px-3 py-2 border border-gray-200 rounded-md text-sm bg-white"
+                                >
+                                    {filteredRooms.length > 0 ? (
+                                        filteredRooms.map((room) => (
+                                            <option key={room.name} value={room.name}>
+                                                {room.name}
+                                            </option>
+                                        ))
+                                    ) : (
+                                        <option value="">No matching classrooms</option>
+                                    )}
+                                </select>
+                            </div>
+
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700 mb-2">
+                                    Floor
+                                </label>
+                                <select
+                                    value={selectedFloor}
+                                    onChange={(e) => setSelectedFloor(e.target.value)}
+                                    className="w-full px-3 py-2 border border-gray-200 rounded-md text-sm bg-white"
+                                >
+                                    {floorOptions.map((floor) => (
+                                        <option key={floor} value={floor}>
+                                            {floor === "All" ? "All floors" : `Floor ${floor}`}
+                                        </option>
+                                    ))}
+                                </select>
+                            </div>
+
+                            <div className="grid grid-cols-2 gap-3">
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                                        Start time
+                                    </label>
+                                    <select
+                                        value={startTime}
+                                        onChange={(e) => setStartTime(e.target.value)}
+                                        className="w-full px-3 py-2 border border-gray-200 rounded-md text-sm bg-white"
+                                    >
+                                        {timeOptions.map((value) => (
+                                            <option key={value} value={value}>
+                                                {formatTime(value)}
+                                            </option>
+                                        ))}
+                                    </select>
+                                </div>
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                                        End time
+                                    </label>
+                                    <select
+                                        value={endTime}
+                                        onChange={(e) => setEndTime(e.target.value)}
+                                        className="w-full px-3 py-2 border border-gray-200 rounded-md text-sm bg-white"
+                                    >
+                                        {timeOptions.map((value) => (
+                                            <option key={value} value={value}>
+                                                {formatTime(value)}
+                                            </option>
+                                        ))}
+                                    </select>
+                                </div>
                             </div>
                         </div>
-                        <div className="p-4 rounded-2xl bg-gray-50">
-                            <div className="text-xs text-gray-500">Utilization</div>
-                            <div className="text-lg font-semibold text-gray-800 mt-2">
-                                {selectedClass.utilization}%
+
+                        {filteredRooms.length === 0 ? (
+                            <div className="p-4 rounded-2xl bg-red-50 text-sm text-red-700">
+                                No classrooms match your search or floor selection.
                             </div>
-                        </div>
-                        <div className="p-4 rounded-2xl bg-gray-50">
-                            <div className="text-xs text-gray-500">Peak usage</div>
-                            <div className="text-lg font-semibold text-gray-800 mt-2">
-                                {selectedClass.peakTime}
+                        ) : (
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm text-gray-600">
+                                <div className="p-4 rounded-2xl bg-gray-50">
+                                    <div className="text-xs text-gray-500">Room</div>
+                                    <div className="text-lg font-semibold text-gray-800 mt-2">
+                                        {selectedClass.name}
+                                    </div>
+                                </div>
+                                <div className="p-4 rounded-2xl bg-gray-50">
+                                    <div className="text-xs text-gray-500">Utilization</div>
+                                    <div className="text-lg font-semibold text-gray-800 mt-2">
+                                        {selectedClass.utilization}%
+                                    </div>
+                                </div>
+                                <div className="p-4 rounded-2xl bg-gray-50">
+                                    <div className="text-xs text-gray-500">Peak usage</div>
+                                    <div className="text-lg font-semibold text-gray-800 mt-2">
+                                        {selectedClass.peakTime}
+                                    </div>
+                                </div>
+                                <div className="p-4 rounded-2xl bg-gray-50">
+                                    <div className="text-xs text-gray-500">Least usage</div>
+                                    <div className="text-lg font-semibold text-gray-800 mt-2">
+                                        {selectedClass.lowTime}
+                                    </div>
+                                </div>
+                                <div className="p-4 rounded-2xl bg-gray-50 col-span-1 sm:col-span-2">
+                                    <div className="text-xs text-gray-500">Selected time range</div>
+                                    <div className="text-lg font-semibold text-gray-800 mt-2">
+                                        {formatTime(startTime)} - {formatTime(endTime)}
+                                    </div>
+                                </div>
                             </div>
-                        </div>
-                        <div className="p-4 rounded-2xl bg-gray-50">
-                            <div className="text-xs text-gray-500">Least usage</div>
-                            <div className="text-lg font-semibold text-gray-800 mt-2">
-                                {selectedClass.lowTime}
-                            </div>
-                        </div>
-                    </div>
+                        )}
+                    </>
                 ) : (
                     <div className="text-sm text-gray-600 leading-relaxed">
                         All users can review the most used and least used classrooms above, as well as overall peak and lowest usage windows. Individual classroom selection is limited to Admin only.
