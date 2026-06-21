@@ -68,8 +68,7 @@ export default function Login() {
 
                         <div className="text-center">
                             <div className="text-lg font-semibold text-gray-800">SCUS</div>
-                            <div className="text-xs text-gray-500">Smart classroom</div>
-                            <div className="text-xs text-gray-500">ultimatesystem</div>
+                            <div className="text-xs text-gray-500">Smart Classroom Utilization System</div>
                         </div>
 
                         <p className="text-sm text-gray-500 mt-3">Please login to your account.</p>
